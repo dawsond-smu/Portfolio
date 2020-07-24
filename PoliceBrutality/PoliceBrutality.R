@@ -24,6 +24,14 @@ library(readr)  # for read_csv
 library(knitr)  # for kable
 library(RCurl)
 
+BeersUrl ="https://raw.githubusercontent.com/dawsond-smu/dawsond-smu.github.io/master/Data/Beers.csv"
+Beers <-read_csv(url(BeersUrl))
+BreweriesUrl ="https://raw.githubusercontent.com/dawsond-smu/dawsond-smu.github.io/master/Data/Breweries.csv"
+Breweries <-read_csv(url(BreweriesUrl))
+Beers_Brewery = merge(Beers,Breweries, by.x = "Brewery_id", by.y = "Brew_ID")
+Beers_Brewery_Omit = na.omit(Beers_Brewery)
+
+
 PoliceUrl ="https://raw.githubusercontent.com/dawsond-smu/Analytics/master/PoliceBrutality/PoliceKillingsUS.csv"
 Police <-read_csv(url(PoliceUrl))
 head(Police)
