@@ -26,6 +26,11 @@ library(RCurl)
 install.packages(c("skimr","DataExplorer"))
 library(skimr)
 library(DataExplorer)
+library(usmap)
+library(maps)
+install.packages("statebins")
+library(statebins)
+
 
 #Test Upload and na.omit() Sample
 BeersUrl ="https://raw.githubusercontent.com/dawsond-smu/dawsond-smu.github.io/master/Data/Beers.csv"
@@ -68,5 +73,46 @@ lmMod <- lm(manner_of_death ~ . , data = Police_Mod)
 selectedMod <- step(lmMod)
 summary(selectedMod)
 
+str(usmap::us_map())
+str(usmap::us_map(regions = "counties"))
 
+plot_usmap(data = statepop, values = "pop_2015", color = "red") + 
+  scale_fill_continuous(
+    low = "white", high = "red", name = "Population (2015)", label = scales::comma
+  ) + theme(legend.position = "right")
 
+PoliceByState = Police %>% summarize() %>% group_by(state)
+
+plot_usmap(data = Police, values = "State", color = "red") + 
+  scale_fill_continuous(name = "Population (2015)", label = scales::comma) + 
+  theme(legend.position = "right")
+
+us_states <- map_data("state")
+head(us_states)
+p <- ggplot(data = us_states,
+            mapping = aes(x = long, y = lat,
+                          group = group))
+p + geom_polygon(fill = "white", color = "black")
+
+p <- ggplot(data = us_states,
+            aes(x = long, y = lat,
+                group = group, fill = region))
+p + geom_polygon(color = "gray90", size = 0.1) + guides(fill = FALSE)
+
+p <- ggplot(data = us_states,
+            mapping = aes(x = long, y = lat,
+                          group = group, fill = region))
+p + geom_polygon(color = "gray90", size = 0.1) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  guides(fill = FALSE)
+
+statebins_continuous(state_data = election, state_col = "state",
+                     text_color = "white", value_col = "pct_trump",
+                     brewer_pal="Reds", font_size = 3,
+                     legend_title="Percent Trump")
+
+statebins_continuous(state_data = subset(election, st %nin% "DC"),
+                     state_col = "state",
+                     text_color = "black", value_col = "pct_clinton",
+                     brewer_pal="Blues", font_size = 3,
+                     legend_title="Percent Clinton")
