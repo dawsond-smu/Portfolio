@@ -23,6 +23,9 @@ library(data.table)
 library(readr)  # for read_csv
 library(knitr)  # for kable
 library(RCurl)
+install.packages(c("skimr","DataExplorer"))
+library(skimr)
+library(DataExplorer)
 
 #Test Upload and na.omit() Sample
 BeersUrl ="https://raw.githubusercontent.com/dawsond-smu/dawsond-smu.github.io/master/Data/Beers.csv"
@@ -43,6 +46,27 @@ PovertyUrl ="https://raw.githubusercontent.com/dawsond-smu/Portfolio/master/Poli
 Poverty <-read_csv(url(PovertyUrl))
 EducationUrl ="https://raw.githubusercontent.com/dawsond-smu/Portfolio/master/PoliceBrutality/PercentOver25CompletedHighSchool.csv"
 Education <-read_csv(url(EducationUrl))
+
+skim(Police)
+DataExplorer::create_report(Police)
+skim(Race)
+DataExplorer::create_report(Race)
+skim(Income)
+DataExplorer::create_report(Income)
+skim(Poverty)
+DataExplorer::create_report(Poverty)
+skim(Education)
+DataExplorer::create_report(Education)
+
+head(Police)
+summary(Police)
+Police_Mod = Police %>% mutate(flee = as.factor(flee), body_camera = as.factor(body_camera), manner_of_death = as.factor(manner_of_death), signs_of_mental_illness = as.factor(signs_of_mental_illness), threat_level = as.factor(threat_level), armed = as.factor(armed), gender = as.factor(gender), race = as.factor(race))
+head(Police_Mod)
+skim(Police_Mod)
+DataExplorer::create_report(Police_Mod)
+lmMod <- lm(manner_of_death ~ . , data = Police_Mod)
+selectedMod <- step(lmMod)
+summary(selectedMod)
 
 
 
