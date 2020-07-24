@@ -81,11 +81,45 @@ plot_usmap(data = statepop, values = "pop_2015", color = "red") +
     low = "white", high = "red", name = "Population (2015)", label = scales::comma
   ) + theme(legend.position = "right")
 
-PoliceByState = Police %>% summarize() %>% group_by(state)
+PoliceByState = Police %>% group_by(state) %>% summarize(N = n()) 
+PoliceByState
 
-plot_usmap(data = Police, values = "State", color = "red") + 
-  scale_fill_continuous(name = "Population (2015)", label = scales::comma) + 
+help(plot_usmap)
+plot_usmap(data = PoliceByState, values = "N", labels = TRUE, label_color = "white") + 
+  scale_fill_continuous(name = "N", label = scales::comma, type = "viridis") + 
+  cale_colour_steps2() + 
   theme(legend.position = "right")
+
+
+
+
+
+
+
+
+
+
+
+
+plot_usmap()
+plot_usmap(regions = "states")
+plot_usmap(regions = "counties")
+plot_usmap(regions = "state")
+plot_usmap(regions = "county")
+
+# Output is ggplot object so it can be extended
+# with any number of ggplot layers
+library(ggplot2)
+plot_usmap(include = c("CA", "NV", "ID", "OR", "WA")) +
+  labs(title = "Western States")
+
+# Color maps with data
+plot_usmap(data = statepop, values = "pop_2015")
+
+# Include labels on map (e.g. state abbreviations)
+plot_usmap(data = statepop, values = "pop_2015", labels = TRUE)
+# Choose color for labels
+plot_usmap(data = statepop, values = "pop_2015", labels = TRUE, label_color = "white")
 
 us_states <- map_data("state")
 head(us_states)
@@ -116,3 +150,22 @@ statebins_continuous(state_data = subset(election, st %nin% "DC"),
                      text_color = "black", value_col = "pct_clinton",
                      brewer_pal="Blues", font_size = 3,
                      legend_title="Percent Clinton")
+
+opiates
+library(viridis)
+
+p0 <- ggplot(data = subset(opiates_map, year > 1999),
+             mapping = aes(x = long, y = lat,
+                           group = group,
+                           fill = adjusted))
+
+p1 <- p0 + geom_polygon(color = "gray90", size = 0.05) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) 
+
+p2 <- p1 + scale_fill_viridis_c(option = "plasma")
+
+p2 + theme_map() + facet_wrap(~ year, ncol = 3) +
+  theme(legend.position = "bottom",
+        strip.background = element_blank()) +
+  labs(fill = "Death rate per 100,000 population ",
+       title = "Opiate Related Deaths by State, 2000-2014")  
